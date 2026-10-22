@@ -32,9 +32,10 @@ Existing README changes and untracked documentation predate management setup and
 - Tests: Vitest, Supertest, and Playwright. Exact scripts and versions will be established during foundation setup.
 - Managed video hosting with protected playback; provider is not selected.
 - OpenAPI/Swagger API documentation.
-- Private receipt/file storage and authentication approach remain unresolved (see T001).
+- Private local file storage outside the web root on a persistent volume; managed hosting remains responsible for video delivery.
+- PostgreSQL-backed cookie sessions; same-origin HTTPS deployment of frontend and API.
 
-Express/TypeScript is the planning baseline because the README and architecture agree on it. The Laravel reference in the implementation plan must be reconciled before implementation. Do not install packages or select versions solely from these planning notes; verify compatibility during implementation.
+T001 selected Express/TypeScript, private local storage, and server-side sessions on October 22, 2026. The implementation plan now matches these decisions. Keep a single application host with persistent file storage for the MVP; horizontal scaling or ephemeral hosting requires a storage review. See `docs/ARCHITECTURE.md` for session, CSRF, proxy, file-access, and backup requirements. Do not install packages or select versions solely from these planning notes; verify compatibility during implementation.
 
 Backend services own business rules and transactions. PostgreSQL is the source of truth for accounts, course access, learning records, and finances. The frontend must not decide prices, roles, payment approval, completion eligibility, or earnings.
 
@@ -52,14 +53,21 @@ Backend services own business rules and transactions. PostgreSQL is the source o
 - Apply localization, accessibility, security, and auditing within relevant features, not just at launch.
 - Never commit secrets or use fake production payment confirmations.
 
-## Open Decisions
+## Deferred Decisions and Gates
 
-Resolve and document these in T001 before application implementation:
+The implementing task owns technical selection; operator decisions must be requested before policy-dependent behavior is finalized. Do not invent production values or treat these as blockers to unrelated foundation work.
 
-1. Reconcile the Laravel reference with the Express/TypeScript baseline.
-2. Choose private local filesystem storage versus private object storage. The README and architecture currently disagree. Preserve private access requirements either way.
-3. Select a session or token authentication approach and document its security and deployment implications.
-4. Record deferred provider and business-policy choices with the tasks they gate, including video hosting, commission/refund rules, and quiz/completion rules. Do not invent production values.
+| Decision | Gate and responsible task |
+| --- | --- |
+| Runtime/package versions, package manager, local database setup | T002: verify compatibility and document reproducible commands before foundation completion. |
+| Session middleware/store, expiration defaults, reset delivery provider/channel | T003: verify dependencies and confirm delivery with the operator before authentication completion. |
+| Video hosting provider, playback integration, upload limits | T005: operator approves provider/cost; implementation verifies protected playback. T008 verifies learner access. |
+| Wallet recipient details, receipt/reference rules and retry limits | T007: operator supplies valid payment instructions and review policy before real payment use. |
+| Quiz pass marks, retries, required lessons, certificate eligibility | T009: operator confirms policy before completion/scoring rules are finalized. |
+| Commission, rounding, refund policy and access revocation | T010: operator confirms policy before financial calculations. Coordinate purchase/earnings snapshots with T007; no real payment workflow is production-ready until integrated. |
+| Payout minimums, eligibility and review rules | T011: operator confirms before payout behavior is finalized. |
+| Translation approval | T012: operator or qualified reviewer approves Burmese/English content; report any review gaps. |
+| Deployment host, backup/restore targets, retention, monitoring, agreements and applicable legal/provider review | T013: operator supplies deployment/policy approvals; verify operational controls before pilot readiness. No compliance assumption or deployment authorization is implied. |
 
 ## Detailed Requirements
 
@@ -70,7 +78,7 @@ Existing detailed documents remain in place. Paths below are relative to this pr
 - `docs/ARCHITECTURE.md`: architecture, module boundaries, and suggested structure.
 - `docs/DATA_MODEL_AND_API.md`: proposed entities, routes, and data integrity rules.
 - `docs/SECURITY_AND_OPERATIONS.md`: security controls and payment workflow.
-- `docs/IMPLEMENTATION_PLAN.md`: original phases; contains a known stack conflict. Tracked tasks now live in `TASKS.md`.
+- `docs/IMPLEMENTATION_PLAN.md`: phase roadmap mapped to the tracked tasks in `TASKS.md`.
 
 These are design inputs, not evidence that features work. Resolve inconsistencies explicitly rather than silently treating one document as implemented truth.
 

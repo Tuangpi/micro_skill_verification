@@ -1,12 +1,13 @@
 # Tasks
 
-All application deliverables are unimplemented as of October 22, 2026. Management setup is recorded in `PROGRESS.md`; it does not complete T001. Dependencies refer to stable task IDs. Follow the workflow in `PROJECT.md`.
+Application implementation has not started as of October 22, 2026. Documentation decision work is tracked separately in T001. Dependencies refer to stable task IDs. Follow the workflow and deferred-decision gates in `PROJECT.md`.
 
 ## T001 — Align requirements and technical decisions
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** None
 - **Expected result:** Consistent backend/storage documentation and a recorded authentication decision. Deferred provider and business-policy decisions have explicit owners or gating tasks.
 - **Completion check:** Review all existing design documents; reconcile Laravel versus Express and local versus object storage; document authentication security/deployment implications; update affected docs and tracking without losing requirements. Record unresolved external decisions explicitly and obtain essential user decisions where needed.
+- **Evidence:** October 22, 2026: aligned README, architecture, implementation roadmap, security requirements, and proposed authentication records/routes. Selected Express/TypeScript, private local storage, and PostgreSQL-backed sessions; recorded operator-dependent decision gates in `PROJECT.md`. Read-back and repository searches checked consistency; `git diff --check` passed. No runtime implementation was part of this task.
 
 ## T002 — Application foundation
 - **Status:** TODO

@@ -30,9 +30,9 @@ Build a mobile-first, bilingual (Burmese and English) learning marketplace for M
 - **Validation:** Zod
 - **Frontend data fetching:** TanStack Query
 - **Forms:** React Hook Form + Zod
-- **Authentication:** Secure session or token-based authentication with role-based authorization
+- **Authentication:** PostgreSQL-backed server sessions with secure cookies and server-enforced role-based authorization
 - **Video:** Managed video hosting with protected playback
-- **Storage:** Local server filesystem
+- **Storage:** Private local server filesystem outside the web root, on a persistent volume
 - **Testing:** Vitest, Supertest, Playwright
 
 The application must support three primary roles: students, instructors, and administrators. The architecture must support multiple instructors, course ownership, manual payment verification, student enrollment, quizzes, certificates, and instructor earnings.
@@ -41,3 +41,6 @@ Keep frontend and backend separate, use TypeScript throughout, validate all API 
 
 ## Initial Launch
 Start with 3–5 teachers and three courses: graphic design, video editing, and digital marketing. Validate demand before expanding.
+
+## Project Management
+The stack above is planned, not implemented. Read `PROJECT.md` for decisions and constraints, `TASKS.md` for ordered deliverables and completion checks, and `PROGRESS.md` for the current handoff. Detailed authentication, deployment, and storage requirements are in `docs/ARCHITECTURE.md`.

@@ -2,15 +2,24 @@
 
 ## Current State
 
-- **Current task:** None. Project-management setup is complete; implementation has not started.
-- **Most recently completed task:** None. Only management setup has been completed.
+- **Current task:** None.
+- **Most recently completed task:** T001 — Align requirements and technical decisions (DONE).
 - **Verified state:** Documentation-only repository; no application, dependency manifests, database schema, or runnable test setup.
-- **Important unfinished work:** T001 must reconcile the backend and storage documentation and document authentication. The README/architecture plan Express/TypeScript, while the original implementation plan mentions Laravel. The README specifies local storage, while the architecture specifies private object storage.
-- **Blockers:** No blocker to starting T001. Decisions may require clarification during that task; no implementation choices have been silently finalized.
-- **Recommended next task:** T001 — Align requirements and technical decisions.
-- **Preserve:** Pre-existing modified README and untracked documentation. No commit or deployment is authorized.
+- **Important unfinished work:** T002 must establish reproducible frontend/backend/database setup and checks. Authentication, file controls, and all marketplace features remain unimplemented. Operator-dependent provider and policy decisions have gates in `PROJECT.md`.
+- **Blockers:** None to starting T002. Initial shell inventory did not return observable results; subsequent standalone Git checks succeeded. Verify command execution before relying on runtime results.
+- **Recommended next task:** T002 — Application foundation.
+- **Preserve:** Pre-existing user documentation content; only task-related alignment edits were made. No commit or deployment is authorized.
 
 ## Recent Notes
+
+### October 22, 2026 — T001 complete
+
+- Selected Express/TypeScript, retaining the established planned stack; corrected the implementation roadmap and mapped phases to one-task-per-session tracking.
+- Retained private local filesystem storage outside the web root on a persistent volume. Documented single-host constraints, API-authorized downloads, validation, and database-plus-file backup requirements. Video delivery remains managed externally.
+- Selected PostgreSQL-backed opaque cookie sessions and same-origin HTTPS deployment. Documented CSRF/origin checks, secure cookie flags, rotation/revocation, expiry, trusted proxies, reset delivery, and deferred dependency selection. Reviewed primary Express/OWASP guidance; no dependency was installed.
+- Updated `README.md`, `PROJECT.md`, `TASKS.md`, and the architecture, implementation, data/API, and security documents. Product requirements were preserved. Deferred providers, financial/completion rules, and operational approvals have explicit gating tasks; no production policy values were invented.
+- **Checks:** Read back edited documents and searched the repository for stale stack/storage/authentication references and task statuses/dependencies. Final `git diff --check` passed and `git status --short` confirmed eight task-related modified documents. Initial combined status/inventory command returned no observable completion, but standalone Git checks succeeded. No runnable application/test setup exists, so runtime tests/builds were not applicable.
+- **Result:** T001 DONE. T002 is ready but was not started. No commit, deployment, or application code change.
 
 ### October 22, 2026 — Project-management setup
 

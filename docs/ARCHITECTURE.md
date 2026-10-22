@@ -12,7 +12,8 @@
 - **Frontend Data Fetching:** TanStack Query
 - **Forms:** React Hook Form + Zod
 - **Video:** Managed video hosting with protected playback and access controls
-- **Storage:** Private object storage for payment receipts and other private files
+- **Storage:** Private local server filesystem outside the web root, on a persistent volume
+- **Authentication:** PostgreSQL-backed server sessions with secure cookies and server-side authorization
 - **API Documentation:** OpenAPI / Swagger
 - **Testing:** Vitest, Supertest, Playwright
 - **Languages:** Burmese and English, with a responsive UI for desktop, tablet, and mobile devices
@@ -43,7 +44,7 @@ Each module should own its business rules and expose clearly defined interfaces 
 - Use PostgreSQL transactions for payment approval, enrollment activation, earnings allocation, and payout-related financial updates.
 - Never trust client-supplied prices, roles, payment statuses, completion statuses, or earnings. Calculate or verify them on the server.
 - Make payment approval and other critical operations idempotent where appropriate to prevent duplicate financial records or enrollments.
-- Store payment receipts in private object storage. Restrict uploads by file type and size, and authorize receipt access.
+- Store payment receipts on private local storage outside the web root. Restrict uploads by file type and size, and authorize receipt access.
 - Protect course videos using signed playback URLs or equivalent provider-supported access controls.
 - Store secrets and environment-specific configuration in environment variables. Validate required configuration during application startup.
 - Apply centralized error handling, structured logging, and consistent API response formats.
@@ -154,6 +155,39 @@ Each backend module should contain its own routes, controller or handler, servic
 - **Services** coordinate business operations and transactions.
 - **Prisma** provides typed database access to PostgreSQL.
 - **PostgreSQL** is the source of truth for users, courses, purchases, enrollments, learning progress, and financial records.
-- **Video hosting and object storage** handle media delivery and private file storage separately from the main application database.
+- **Managed video hosting and private local file storage** handle media delivery and private file bytes separately from the main application database.
 
 The architecture must support multiple instructors, secure course ownership, manual payment verification through local payment methods such as KBZPay and WavePay, protected course access, certificates, and auditable instructor earnings.
+
+## MVP Decisions — October 22, 2026 (T001)
+
+These decisions are implementation requirements, not claims of working code. No package versions or additional authentication/storage dependencies are selected here.
+
+### Backend and Deployment
+
+Use Node.js/Express and TypeScript, not Laravel, matching the README and architecture. Keep the frontend and backend separate in source and build output, but serve them through one HTTPS origin in production, routing `/api/v1` to Express. Use a development proxy for the same API path. Cross-origin deployments require a separate security review rather than permissive credentialed CORS.
+
+### Authentication
+
+Use opaque session IDs in cookies and PostgreSQL-backed server-side session records. This is the chosen MVP approach for central logout/revocation without introducing another datastore. Do not store bearer credentials in browser local storage. Select and verify compatible session middleware/store dependencies during T003; the table list in `DATA_MODEL_AND_API.md` is conceptual, not a prescribed adapter schema.
+
+- Set production cookies to `HttpOnly`, `Secure`, and `SameSite=Lax`, host-only (no Domain attribute), with Path `/`. Require HTTPS; any insecure cookie exception is limited to local development.
+- Protect state-changing requests, including authentication and uploads, with server-validated CSRF tokens and trusted-origin checks. SameSite alone is not the CSRF defense; GET requests must not mutate state.
+- Regenerate session IDs on login and privilege changes. Destroy sessions on logout; invalidate affected sessions after password reset or account suspension. Read current account status and permissions on protected requests rather than trusting stale role claims.
+- Enforce configurable idle and absolute expiration server-side and clean expired records. T003 must select and test concrete defaults, secure password hashing, rate limiting, reset-token expiry, and single use.
+- Keep session secrets in environment configuration. Trust only the configured reverse-proxy boundary for HTTPS/client-IP detection, not arbitrary forwarded headers. Do not use an in-memory production session store.
+- Plan password-reset delivery with the operator before T003 is complete; never expose reset tokens in production responses or logs.
+
+### Private File Storage
+
+Retain the README's local filesystem choice for the small MVP deployment rather than introducing an object-storage provider. Use one application host with a persistent private volume; ephemeral/serverless filesystem deployment is not supported by this plan. Horizontal scaling requires shared private storage or a reviewed object-storage migration first.
+
+- Keep file bytes outside static/public directories and source control. Store only file metadata, ownership, and generated storage keys in PostgreSQL; never accept user-controlled filesystem paths.
+- Authorize upload/download through the API. Owners may view their own receipts and administrators may review them; teachers and unrelated students must not access receipts. Course resources require ownership or valid enrollment as appropriate.
+- Use generated filenames, type/size allowlists and content validation, path-traversal protection, least-privilege filesystem permissions, and safe download headers. Define exact limits in T005/T007.
+- Back up and restore the private volume together with database metadata; define cleanup/retention and disk-capacity monitoring before launch. Do not imply database backups include file bytes.
+- Keep course video delivery on the managed video provider; do not use this volume as public video hosting.
+
+### Guidance Reviewed
+
+Primary guidance reviewed for these requirements: Express session middleware documentation and OWASP Session Management and File Upload cheat sheets. Locate the current official documentation before implementing library-specific configuration; no middleware API has been fixed by this design.

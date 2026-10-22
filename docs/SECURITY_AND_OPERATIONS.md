@@ -16,6 +16,9 @@
 - Publish terms, teacher agreements, and refund policies.
 - Configure database backups, error monitoring, and production logging.
 - Test backup restoration before launch.
+- Back up and restore both PostgreSQL and private filesystem data; monitor persistent-volume capacity. A database-only backup does not restore receipts.
+- Use PostgreSQL-backed sessions, secure host-only cookies, CSRF tokens and origin checks, session rotation/revocation, and server-enforced expiry as specified in `ARCHITECTURE.md`.
+- Route the frontend and API through one HTTPS origin; configure trusted proxy boundaries explicitly.
 - Check applicable Myanmar business, privacy, tax, and payment-provider requirements.
 
 ## Payment Process

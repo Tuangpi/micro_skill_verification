@@ -2,6 +2,7 @@
 
 ## Main Tables
 - `users`: accounts and roles.
+- Server-side sessions and single-use password-reset records: schema and indexes to be finalized with the selected implementation in T003; never store plaintext reset tokens.
 - `teacher_profiles`: teacher details and approval status.
 - `courses`: teacher-owned courses, prices, and publication status.
 - `course_sections`: ordered course sections.
@@ -23,6 +24,11 @@
 ## Core Endpoints
 - `POST /auth/register`
 - `POST /auth/login`
+- `POST /auth/logout`
+- `GET /auth/session`
+- `GET /auth/csrf-token`
+- `POST /auth/password-reset-requests`
+- `POST /auth/password-resets`
 - `GET /courses`
 - `GET /courses/{slug}`
 - `POST /purchases`
@@ -50,3 +56,4 @@
 - Use transactions for approvals and payouts.
 - Store quiz answers securely on the server.
 - Enforce ownership and enrollment checks on every protected endpoint.
+- Authentication endpoints use cookie sessions and the CSRF/origin controls in `ARCHITECTURE.md`; reset requests must not disclose whether an account exists. These routes are proposed contracts to finalize and test in T003, not implemented endpoints.
