@@ -10,10 +10,11 @@ Application implementation has not started as of October 22, 2026. Documentation
 - **Evidence:** October 22, 2026: aligned README, architecture, implementation roadmap, security requirements, and proposed authentication records/routes. Selected Express/TypeScript, private local storage, and PostgreSQL-backed sessions; recorded operator-dependent decision gates in `PROJECT.md`. Read-back and repository searches checked consistency; `git diff --check` passed. No runtime implementation was part of this task.
 
 ## T002 — Application foundation
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T001
 - **Expected result:** Separate runnable TypeScript frontend/backend, PostgreSQL/Prisma setup, configuration validation, API health endpoint, and documented development/test commands.
 - **Completion check:** Verify clean dependency installation, frontend/backend startup, database connectivity and an initial migration, type checks, linting, builds, and baseline tests. Provide safe environment examples without secrets and record the actual commands/results.
+- **Evidence:** October 22, 2026: npm workspace with `backend/` (Express 5.3, Prisma 7.10.1, Zod, pino) and `frontend/` (React 19.3, Vite 8.3, Tailwind 4.3). Zod-validated environment loading, pino structured logging, and a centralized error handler produce the documented `{ data }` / `{ error }` envelope. `GET /api/v1/health` reports database reachability and latency. Prisma `User`/`UserRole` models migrated to `micro_skill_dev` and deployed to `micro_skill_test`. Frontend renders live API health through the Vite `/api` proxy. `docs/API_CONVENTIONS.md` and `docs/SETUP.md` record the contract and commands. Root `npm run verify` (format:check, lint, typecheck, test, build) passed with 14 backend and 7 frontend tests green, including after a clean `npm ci` reinstall.
 
 ## T003 — Authentication and authorization
 - **Status:** TODO

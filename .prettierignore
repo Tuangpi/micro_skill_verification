@@ -1,0 +1,18 @@
+# Build output and generated files
+dist
+build
+coverage
+
+# Generated Prisma client
+backend/src/generated
+
+# Pre-existing product documentation is maintained outside the formatter's scope
+docs/ARCHITECTURE.md
+docs/DATA_MODEL_AND_API.md
+docs/IMPLEMENTATION_PLAN.md
+docs/PRODUCT_REQUIREMENTS.md
+docs/SECURITY_AND_OPERATIONS.md
+README.md
+PROJECT.md
+TASKS.md
+PROGRESS.md

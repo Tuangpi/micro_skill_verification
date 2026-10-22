@@ -20,9 +20,18 @@ Out of scope: automated wallet integration, subscriptions, native apps, live cla
 
 ## Verified Repository State
 
-As of October 22, 2026, the repository contains a README and five design documents. No application code, dependency manifests, database schema, test setup, or deployment configuration exists. All application features and technologies below are planned, not implemented or runtime-verified.
+As of October 22, 2026, T002 is complete and runtime-verified. The repository contains a runnable npm workspace:
 
-Existing README changes and untracked documentation predate management setup and must be preserved.
+- `backend/`: Express 5 modular monolith in TypeScript with Zod-validated environment loading, pino structured logging, a centralized error handler, and `GET /api/v1/health` performing a live database check.
+- `frontend/`: React 19 + Vite 8 + Tailwind CSS 4 app shell with a typed API client and a health panel rendered through the Vite `/api` proxy.
+- `backend/prisma/`: Prisma 7 schema with `User`/`UserRole` models, `prisma.config.ts`, the `prisma-client` generator, and `@prisma/adapter-pg`. The initial migration is applied to `micro_skill_dev` and deployed to `micro_skill_test`.
+- Root tooling: Prettier, ESLint, TypeScript project references, and `npm run verify` (format:check, lint, typecheck, test, build).
+
+Verified results: 14 backend tests and 7 frontend tests pass; lint, type-check, build, `prisma generate`, and `prisma migrate status` are clean. The response contract is documented in `docs/API_CONVENTIONS.md` and setup commands in `docs/SETUP.md`.
+
+Existing README changes and untracked product documentation predate management setup and must be preserved.
+
+Application features remain limited to the foundation: authentication, marketplace features, payments, quizzes, certificates, and payouts are planned, not implemented.
 
 ## Planned Stack and Architecture
 
@@ -59,7 +68,7 @@ The implementing task owns technical selection; operator decisions must be reque
 
 | Decision | Gate and responsible task |
 | --- | --- |
-| Runtime/package versions, package manager, local database setup | T002: verify compatibility and document reproducible commands before foundation completion. |
+| Runtime/package versions, package manager, local database setup | T002 (resolved October 22, 2026): npm workspace, Node 22, Express 5.3, Prisma 7.10, React 19.3, Vite 8.3, Tailwind 4.3. Re-verify compatibility when upgrading. |
 | Session middleware/store, expiration defaults, reset delivery provider/channel | T003: verify dependencies and confirm delivery with the operator before authentication completion. |
 | Video hosting provider, playback integration, upload limits | T005: operator approves provider/cost; implementation verifies protected playback. T008 verifies learner access. |
 | Wallet recipient details, receipt/reference rules and retry limits | T007: operator supplies valid payment instructions and review policy before real payment use. |
@@ -79,6 +88,8 @@ Existing detailed documents remain in place. Paths below are relative to this pr
 - `docs/DATA_MODEL_AND_API.md`: proposed entities, routes, and data integrity rules.
 - `docs/SECURITY_AND_OPERATIONS.md`: security controls and payment workflow.
 - `docs/IMPLEMENTATION_PLAN.md`: phase roadmap mapped to the tracked tasks in `TASKS.md`.
+- `docs/API_CONVENTIONS.md`: implemented response envelope, error codes, and status codes.
+- `docs/SETUP.md`: implemented setup steps and development/test commands.
 
 These are design inputs, not evidence that features work. Resolve inconsistencies explicitly rather than silently treating one document as implemented truth.
 
