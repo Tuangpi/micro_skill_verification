@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { ApiError, fetchHealth } from './api/client.ts';
 import type { HealthStatus } from './api/types.ts';
+import { AuthPanel } from './auth/AuthPanel.tsx';
 
 type HealthState =
   | { kind: 'loading' }
@@ -59,6 +60,8 @@ export function App() {
         <h2 className="mb-4 text-lg font-medium">API status</h2>
         <HealthPanel state={health} />
       </section>
+
+      <AuthPanel />
     </main>
   );
 }

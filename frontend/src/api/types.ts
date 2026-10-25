@@ -17,7 +17,7 @@ export interface ApiErrorPayload {
   details?: unknown;
 }
 
-/** Envelope returned for a failed request. */
+/** Envelope returned for a failed response. */
 export interface ApiErrorResponse {
   error: ApiErrorPayload;
 }
@@ -36,4 +36,13 @@ export interface HealthStatus {
       latencyMs: number;
     };
   };
+}
+
+/** Authenticated user summary returned by the backend. */
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: 'STUDENT' | 'TEACHER' | 'ADMIN';
+  isActive: boolean;
 }

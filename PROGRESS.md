@@ -3,13 +3,22 @@
 ## Current State
 
 - **Current task:** None.
-- **Most recently completed task:** T002 — Application foundation (DONE).
-- **Verified state:** Runnable npm workspace. `backend/` (Express 5, Prisma 7, Zod, pino) and `frontend/` (React 19, Vite 8, Tailwind 4) both install, lint, type-check, build, and test cleanly. `GET /api/v1/health` reports live database reachability. Root `npm run verify` passed with 14 backend and 7 frontend tests green.
-- **Important unfinished work:** T003 (authentication and authorization) is the next deliverable. All marketplace features, file controls, and payments remain unimplemented. Operator-dependent provider and policy decisions still have gates in `PROJECT.md`.
-- **Blockers:** None. The `micro_skill` PostgreSQL role requires `CREATEDB` and explicit `public` schema grants on each target database.
-- **Recommended next task:** T003 — Authentication and authorization.
-- **Preserve:** Pre-existing user documentation content; only task-related edits were made. No commit or deployment is authorized.
+- **Most recently completed task:** T003 — Authentication and authorization (DONE).
+- **Verified state:** Runnable npm workspace with auth. Backend tests 22, frontend 7. Full `npm run verify` passed.
+- **Important unfinished work:** T004+ marketplace features remain unimplemented. Operator gates remain.
+- **Blockers:** None.
+- **Recommended next task:** T004.
+- **Preserve:** Pre-existing user documentation; only task-related edits.
 
+
+### October 25, 2026 — T003 complete
+
+- Implemented auth module: scrypt password hashing (Node crypto), express-session + connect-pg-simple, manual double-submit CSRF, express-rate-limit on auth routes, role-protected admin endpoint.
+- Added Prisma models: `Session`, `PasswordResetToken`; migration `20261025062515_t003_auth`.
+- Endpoints: register, login, logout, session, csrf-token, password-reset-requests, password-resets, admin/ping.
+- Frontend minimal auth flow: AuthPanel with register/login/logout/session check; typed client helpers.
+- **Checks:** Full `npm run verify` passed (format, lint, typecheck, tests, build). Backend 22 tests, frontend 7 tests.
+- **Result:** T003 DONE. T004 ready.
 ## Recent Notes
 
 ### October 22, 2026 — T002 complete

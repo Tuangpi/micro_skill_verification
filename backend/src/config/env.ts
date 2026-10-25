@@ -22,6 +22,11 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   STORAGE_ROOT: z.string().min(1).default('./var/storage'),
   TRUST_PROXY: booleanish.default(false),
+  SESSION_SECRET: z.string().min(32, 'SESSION_SECRET must be at least 32 characters'),
+  SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(10080).default(30),
+  SESSION_ABSOLUTE_HOURS: z.coerce.number().int().min(1).max(8760).default(168),
+  AUTH_RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().min(1).max(1440).default(15),
+  AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(10),
 });
 
 export type AppConfig = {
@@ -33,6 +38,11 @@ export type AppConfig = {
   databaseUrl: string;
   storageRoot: string;
   trustProxy: boolean;
+  sessionSecret: string;
+  sessionIdleMinutes: number;
+  sessionAbsoluteHours: number;
+  authRateLimitWindowMinutes: number;
+  authRateLimitMax: number;
   isProduction: boolean;
 };
 
@@ -59,6 +69,11 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     databaseUrl: env.DATABASE_URL,
     storageRoot: env.STORAGE_ROOT,
     trustProxy: env.TRUST_PROXY,
+    sessionSecret: env.SESSION_SECRET,
+    sessionIdleMinutes: env.SESSION_IDLE_MINUTES,
+    sessionAbsoluteHours: env.SESSION_ABSOLUTE_HOURS,
+    authRateLimitWindowMinutes: env.AUTH_RATE_LIMIT_WINDOW_MINUTES,
+    authRateLimitMax: env.AUTH_RATE_LIMIT_MAX,
     isProduction: env.NODE_ENV === 'production',
   };
 }

@@ -2,6 +2,7 @@ import type {
   ApiErrorPayload,
   ApiErrorResponse,
   ApiSuccessResponse,
+  AuthUser,
   HealthStatus,
 } from './types.ts';
 
@@ -31,6 +32,7 @@ export class ApiError extends Error {
 export async function request<TData>(path: string, init?: RequestInit): Promise<TData> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
+    credentials: init?.credentials ?? 'include',
     headers: {
       Accept: 'application/json',
       ...init?.headers,
@@ -91,6 +93,70 @@ function isErrorResponse(payload: unknown): payload is ApiErrorResponse {
 }
 
 /** Fetches the API and database health status. */
+
+/** Fetches (and sets) a CSRF token cookie, returning the token. */
+export async function fetchCsrfToken(): Promise<string> {
+  const data = await request<{ csrfToken: string }>('/auth/csrf-token', {
+    method: 'GET',
+  });
+  return data.csrfToken;
+}
+
+export type RegisterInput = { email: string; name: string; password: string };
+export type LoginInput = { email: string; password: string };
+
+export async function registerUser(input: RegisterInput): Promise<AuthUser> {
+  const data = await request<{ user: AuthUser }>('/auth/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': await fetchCsrfToken(),
+    },
+    body: JSON.stringify(input),
+  });
+  return data.user;
+}
+
+export async function loginUser(input: LoginInput): Promise<AuthUser> {
+  const csrfToken = await fetchCsrfToken();
+  const data = await request<{ user: AuthUser }>('/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+    body: JSON.stringify(input),
+  });
+  return data.user;
+}
+
+export async function logoutUser(): Promise<void> {
+  const csrfToken = await fetchCsrfToken();
+  await request<unknown>('/auth/logout', {
+    method: 'POST',
+    headers: { 'X-CSRF-Token': csrfToken },
+  });
+}
+
+export async function fetchSession(): Promise<AuthUser> {
+  const data = await request<{ user: AuthUser }>('/auth/session');
+  return data.user;
+}
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  const csrfToken = await fetchCsrfToken();
+  await request<unknown>('/auth/password-reset-requests', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function resetPassword(token: string, password: string): Promise<void> {
+  const csrfToken = await fetchCsrfToken();
+  await request<unknown>('/auth/password-resets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+    body: JSON.stringify({ token, password }),
+  });
+}
 export function fetchHealth(): Promise<HealthStatus> {
   return request<HealthStatus>('/health');
 }

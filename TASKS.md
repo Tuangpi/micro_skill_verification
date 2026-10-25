@@ -17,7 +17,7 @@ Application implementation has not started as of October 22, 2026. Documentation
 - **Evidence:** October 22, 2026: npm workspace with `backend/` (Express 5.3, Prisma 7.10.1, Zod, pino) and `frontend/` (React 19.3, Vite 8.3, Tailwind 4.3). Zod-validated environment loading, pino structured logging, and a centralized error handler produce the documented `{ data }` / `{ error }` envelope. `GET /api/v1/health` reports database reachability and latency. Prisma `User`/`UserRole` models migrated to `micro_skill_dev` and deployed to `micro_skill_test`. Frontend renders live API health through the Vite `/api` proxy. `docs/API_CONVENTIONS.md` and `docs/SETUP.md` record the contract and commands. Root `npm run verify` (format:check, lint, typecheck, test, build) passed with 14 backend and 7 frontend tests green, including after a clean `npm ci` reinstall.
 
 ## T003 — Authentication and authorization
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T002
 - **Expected result:** Registration, login, logout, password reset, and account/session handling using the selected approach, with student/teacher/admin permissions enforced on the server.
 - **Completion check:** Test valid and invalid credentials, secure password handling, logout/invalidation, reset-token handling, rate limits, unauthenticated requests, forbidden role escalation, and role-protected endpoints. Verify the frontend authentication flow.

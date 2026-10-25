@@ -13,8 +13,9 @@ datasource db {
   provider = "postgresql"
 }
 
-// Accounts and roles. Password hashing, sessions, and password-reset records
-// are owned by T003 and are intentionally not modelled yet.
+// Accounts and roles. Password hashing uses scrypt (Node crypto). Sessions are
+// backed by express-session + connect-pg-simple (see `Session`). Password-reset
+// records are single-use and stored hashed (see `PasswordResetToken`).
 
 enum UserRole {
   STUDENT
@@ -23,14 +24,40 @@ enum UserRole {
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique @db.VarChar(320)
-  name      String   @db.VarChar(120)
-  passwordHash String @db.VarChar(255)
-  role      UserRole @default(STUDENT)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique @db.VarChar(320)
+  name         String   @db.VarChar(120)
+  passwordHash String   @db.VarChar(255)
+  role         UserRole @default(STUDENT)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  resetTokens PasswordResetToken[]
 
   @@map("users")
+}
+
+// connect-pg-simple session store table (auto-created if missing; tracked here
+// so Prisma migrations own the schema).
+model Session {
+  sid    String   @id @db.VarChar(255)
+  sess   Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
+  @@map("session")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique @db.VarChar(128)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("password_reset_tokens")
 }

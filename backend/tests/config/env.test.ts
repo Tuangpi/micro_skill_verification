@@ -5,6 +5,7 @@ describe('loadConfig', () => {
   const baseEnv = {
     NODE_ENV: 'test',
     DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    SESSION_SECRET: 'test-session-secret-that-is-at-least-32-characters-long',
   } as NodeJS.ProcessEnv;
 
   it('parses a minimal valid environment', () => {
