@@ -45,6 +45,10 @@ model User {
   auditLogs              AuditLog[]
   courses                Course[]
   mediaAssets            MediaAsset[]
+  purchases              Purchase[]
+  paymentSubmissions     PaymentSubmission[]
+  reviewedPaymentSubmissions PaymentSubmission[] @relation("PaymentSubmissionReviewer")
+  enrollments            Enrollment[]
 
   @@map("users")
 }
@@ -132,6 +136,8 @@ model Course {
   coverMediaId String?       @db.Uuid
   coverMedia   MediaAsset?   @relation("CourseCover", fields: [coverMediaId], references: [id], onDelete: SetNull)
   sections     CourseSection[]
+  purchases    Purchase[]
+  enrollments  Enrollment[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -183,8 +189,85 @@ model MediaAsset {
   kind         MediaKind @default(OTHER)
   createdAt    DateTime @default(now())
 
-  coveredCourses Course[] @relation("CourseCover")
+  coveredCourses    Course[] @relation("CourseCover")
+  paymentSubmissions PaymentSubmission[]
 
   @@index([ownerId])
   @@map("media_assets")
+}
+
+enum PurchaseStatus {
+  PENDING
+  PAYMENT_SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum PaymentProvider {
+  KBZPAY
+  WAVEPAY
+}
+
+enum PaymentSubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Purchase {
+  id        String         @id @default(uuid()) @db.Uuid
+  studentId String         @db.Uuid
+  student   User           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId  String         @db.Uuid
+  course    Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  priceMmk  Int
+  status    PurchaseStatus @default(PENDING)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  paymentSubmissions PaymentSubmission[]
+  enrollment         Enrollment?
+
+  @@index([studentId])
+  @@index([courseId])
+  @@index([status])
+  @@map("purchases")
+}
+
+model PaymentSubmission {
+  id                   String                  @id @default(uuid()) @db.Uuid
+  purchaseId           String                  @db.Uuid
+  purchase             Purchase                @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  submittedById        String                  @db.Uuid
+  submittedBy          User                    @relation(fields: [submittedById], references: [id], onDelete: Cascade)
+  provider             PaymentProvider
+  transactionReference String                  @unique @db.VarChar(120)
+  receiptMediaId       String?                 @db.Uuid
+  receiptMedia         MediaAsset?             @relation(fields: [receiptMediaId], references: [id], onDelete: SetNull)
+  status               PaymentSubmissionStatus @default(PENDING)
+  reviewNote           String?                 @db.Text
+  reviewedById         String?                 @db.Uuid
+  reviewedBy           User?                   @relation("PaymentSubmissionReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt           DateTime?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+
+  @@index([purchaseId])
+  @@index([status])
+  @@map("payment_submissions")
+}
+
+model Enrollment {
+  id        String   @id @default(uuid()) @db.Uuid
+  studentId String   @db.Uuid
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId  String   @db.Uuid
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  purchaseId String  @unique @db.Uuid
+  purchase  Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, courseId])
+  @@index([courseId])
+  @@map("enrollments")
 }

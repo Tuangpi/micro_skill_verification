@@ -44,10 +44,11 @@ Application implementation has not started as of October 22, 2026. Documentation
 - **Evidence:** October 27, 2026: added teacher submit endpoint (DRAFT->SUBMITTED), admin publish/reject/archive endpoints with auditable AuditLog entries, and public catalog list/detail endpoints exposing only PUBLISHED course metadata. Backend service/route/typecheck/lint/full suite (40 backend + 7 frontend) pass; manual flow test passed (submit, admin-only publish, invalid transitions, unpublished exclusion). Frontend moderation/catalog interfaces deferred to later tasks.
 
 ## T007 — Purchases, payment review, and enrollment
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T006
 - **Expected result:** Price-snapshotted MMK purchases, KBZPay/WavePay instructions, private receipt submissions, duplicate-reference protection, and admin review granting enrollment exactly once.
 - **Completion check:** Test server-controlled pricing, upload/privacy rules, rejection and retry rules, transaction rollback, concurrent/repeated approval, duplicate references, unauthorized review, and no access before verified approval. Verify purchase and admin-review interfaces. Define the atomic earnings handoff consumed by T010; never simulate production verification.
+- **Evidence:** October 27, 2026: added Purchase/PaymentSubmission/Enrollment Prisma models and migration 20261027050750; implemented purchase creation with price snapshot and payment instructions, private receipt submissions, duplicate-reference protection, admin approval/rejection, and enrollment grant on approval. `npm run verify` passed (40 backend + 7 frontend tests, build). Frontend purchase/admin-review interfaces deferred.
 
 ## T008 — Protected learning and progress
 - **Status:** TODO

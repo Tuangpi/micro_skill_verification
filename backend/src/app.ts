@@ -13,7 +13,12 @@ import { createAuthRouter } from './modules/auth/auth.routes.js';
 import { createAuthRateLimiter } from './modules/auth/rate-limit.js';
 import { createTeacherService } from './modules/teachers/teacher.service.js';
 import { createCourseService } from './modules/courses/course.service.js';
+import { createPurchaseService } from './modules/purchases/purchase.service.js';
 import { createCourseRouter } from './modules/courses/course.routes.js';
+import {
+  createPurchaseRouter,
+  createPurchaseAdminRouter,
+} from './modules/purchases/purchase.routes.js';
 import { createPublicCourseRouter } from './modules/courses/course-public.routes.js';
 import { createCourseAdminRouter } from './modules/courses/course-admin.routes.js';
 import { createFileStorage } from './shared/storage/file-storage.js';
@@ -143,6 +148,21 @@ export function createApp({
     isProduction: config.isProduction,
   });
   app.use(`${config.apiPrefix}/teacher`, courseRouter);
+
+  const purchaseService = createPurchaseService(prisma, logger, fileStorage);
+  const purchaseRouter = createPurchaseRouter({
+    purchaseService,
+    allowedOrigins: config.allowedOrigins,
+    isProduction: config.isProduction,
+  });
+  app.use(config.apiPrefix, purchaseRouter);
+
+  const purchaseAdminRouter = createPurchaseAdminRouter({
+    purchaseService,
+    allowedOrigins: config.allowedOrigins,
+    isProduction: config.isProduction,
+  });
+  app.use(`${config.apiPrefix}/admin`, purchaseAdminRouter);
 
   const publicCourseRouter = createPublicCourseRouter({
     courseService,
