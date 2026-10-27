@@ -47,6 +47,8 @@ model User {
   mediaAssets            MediaAsset[]
   purchases              Purchase[]
   lessonProgress         LessonProgress[]
+  quizAttempts           QuizAttempt[]
+  certificates           Certificate[]
   paymentSubmissions     PaymentSubmission[]
   reviewedPaymentSubmissions PaymentSubmission[] @relation("PaymentSubmissionReviewer")
   enrollments            Enrollment[]
@@ -139,6 +141,8 @@ model Course {
   sections     CourseSection[]
   purchases    Purchase[]
   enrollments  Enrollment[]
+  quizzes      Quiz[]
+  certificates Certificate[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -289,4 +293,72 @@ model LessonProgress {
   @@unique([studentId, lessonId])
   @@index([lessonId])
   @@map("lesson_progress")
+}
+
+enum QuizStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Quiz {
+  id              String        @id @default(uuid()) @db.Uuid
+  courseId        String        @db.Uuid
+  course          Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title           String        @db.VarChar(200)
+  passMarkPercent Int           @default(70)
+  maxAttempts     Int?          @default(5)
+  status          QuizStatus    @default(DRAFT)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  @@index([courseId])
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id            String   @id @default(uuid()) @db.Uuid
+  quizId        String   @db.Uuid
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  prompt        String   @db.Text
+  options       String[]
+  correctOption Int
+  position      Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@index([quizId])
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  id           String   @id @default(uuid()) @db.Uuid
+  quizId       String   @db.Uuid
+  quiz         Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  studentId    String   @db.Uuid
+  student      User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  answers      Json
+  scorePercent Int
+  passed       Boolean
+  createdAt    DateTime @default(now())
+
+  @@index([quizId])
+  @@index([studentId])
+  @@map("quiz_attempts")
+}
+
+model Certificate {
+  id        String   @id @default(uuid()) @db.Uuid
+  number    String   @unique @db.VarChar(64)
+  studentId String   @db.Uuid
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId  String   @db.Uuid
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  quizId    String?  @db.Uuid
+  issuedAt  DateTime @default(now())
+
+  @@unique([studentId, courseId])
+  @@index([courseId])
+  @@map("certificates")
 }

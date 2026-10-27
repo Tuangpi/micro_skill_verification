@@ -3,11 +3,11 @@
 ## Current State
 
 - **Current task:** None.
-- **Most recently completed task:** T008 — Protected learning and progress (DONE).
-- **Verified state:** Runnable npm workspace with auth, teacher applications, course authoring, moderation, public catalog, purchases, payment review, enrollment, and protected learning/progress. Backend tests 40, frontend 7. Full backend suite passes.
-- **Important unfinished work:** Frontend learning/player/dashboard interfaces deferred; T009 not started.
+- **Most recently completed task:** T009 — Quizzes and certificates (DONE).
+- **Verified state:** Runnable npm workspace with auth, teacher applications, course authoring, moderation, public catalog, purchases, payment review, enrollment, protected learning/progress, quizzes, and certificates. Backend tests 40, frontend 7. Full backend suite passes.
+- **Important unfinished work:** Frontend quiz/certificate interfaces deferred; T010 not started.
 - **Blockers:** None.
-- **Recommended next task:** T009 — Quizzes and certificates.
+- **Recommended next task:** T010 — Teacher earnings ledger.
 - **Preserve:** Pre-existing user documentation; only task-related edits.
 
 ### October 25, 2026 — T004 complete
@@ -29,6 +29,15 @@
 - **Checks:** Full `npm run verify` passed (format, lint, typecheck, tests, build). Backend 22 tests, frontend 7 tests.
 - **Result:** T003 DONE. T004 ready.
 ## Recent Notes
+
+### October 27, 2026 — T009 complete
+
+- Added Quiz/QuizQuestion/QuizAttempt/Certificate models and migration `20261027070600_t009_quizzes_certificates`.
+- Documented pass/retry/completion rules in `docs/QUIZ_AND_CERTIFICATE_RULES.md`.
+- Implemented teacher quiz/question management, student quiz view without answers, server-side scoring, retry limits, certificate issuance on pass + all lessons completed, duplicate prevention, and public verification.
+- Typecheck, lint, and full verify pass (40 backend + 7 frontend tests, build). Manual quiz/certificate flow verified.
+- **Result:** T009 DONE. T010 ready. Frontend quiz/certificate interfaces deferred.
+
 
 ### October 27, 2026 — T008 complete
 

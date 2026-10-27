@@ -58,10 +58,11 @@ Application implementation has not started as of October 22, 2026. Documentation
 - **Evidence:** October 27, 2026: added LessonProgress model/migration 20261027055613; implemented authenticated lesson access with enrollment/ownership/admin authorization, course outline navigation, progress upsert, and playback access expiry. `npm run verify` passed (40 backend + 7 frontend tests, build); manual protected-learning flow verified. Frontend player/dashboard interfaces deferred.
 
 ## T009 — Quizzes and certificates
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T008
 - **Expected result:** Teacher quiz management, server-scored student attempts, completion checks, certificate issuance, and public verification without exposing private student data.
 - **Completion check:** First document pass/retry/completion rules; test answer secrecy, server-side scoring, enrollment checks, ineligible certificate denial, duplicate issuance prevention, and valid/invalid verification numbers. Verify quiz and certificate interfaces.
+- **Evidence:** October 27, 2026: added Quiz/QuizQuestion/QuizAttempt/Certificate models and migration 20261027070600; documented rules in docs/QUIZ_AND_CERTIFICATE_RULES.md; implemented teacher quiz/question management, student quiz view without answers, server-side scoring, retry limits, certificate issuance on pass + all lessons completed, duplicate prevention, and public verification. `npm run verify` passed (40 backend + 7 frontend tests, build); manual quiz/certificate flow verified. Frontend interfaces deferred.
 
 ## T010 — Teacher earnings ledger
 - **Status:** TODO
