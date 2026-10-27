@@ -11,6 +11,14 @@ import { createHealthService } from './modules/health/health.service.js';
 import { createAuthService } from './modules/auth/auth.service.js';
 import { createAuthRouter } from './modules/auth/auth.routes.js';
 import { createAuthRateLimiter } from './modules/auth/rate-limit.js';
+import { createTeacherService } from './modules/teachers/teacher.service.js';
+import { createCourseService } from './modules/courses/course.service.js';
+import { createCourseRouter } from './modules/courses/course.routes.js';
+import { createFileStorage } from './shared/storage/file-storage.js';
+import {
+  createTeacherRouter,
+  createTeacherAdminRouter,
+} from './modules/teachers/teacher.routes.js';
 import { attachCurrentUser } from './modules/auth/auth.middleware.js';
 import { createConsoleDelivery } from './modules/auth/delivery.js';
 import type { AuthedUser } from './modules/auth/auth.service.js';
@@ -115,6 +123,31 @@ export function createApp({
   });
 
   app.use(`${config.apiPrefix}/auth`, authRateLimiter, authRouter);
+
+  const teacherService = createTeacherService(prisma, logger);
+  const teacherRouter = createTeacherRouter({
+    teacherService,
+    allowedOrigins: config.allowedOrigins,
+    isProduction: config.isProduction,
+  });
+  app.use(`${config.apiPrefix}/teacher`, teacherRouter);
+
+  const fileStorage = createFileStorage(config);
+  const courseService = createCourseService(prisma, logger, fileStorage);
+  const courseRouter = createCourseRouter({
+    courseService,
+    fileStorage,
+    allowedOrigins: config.allowedOrigins,
+    isProduction: config.isProduction,
+  });
+  app.use(`${config.apiPrefix}/teacher`, courseRouter);
+
+  const teacherAdminRouter = createTeacherAdminRouter({
+    teacherService,
+    allowedOrigins: config.allowedOrigins,
+    isProduction: config.isProduction,
+  });
+  app.use(`${config.apiPrefix}/admin`, teacherAdminRouter);
 
   const adminRouter = express.Router();
   adminRouter.get('/ping', (req, res) => {

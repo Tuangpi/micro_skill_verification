@@ -23,16 +23,18 @@ Application implementation has not started as of October 22, 2026. Documentation
 - **Completion check:** Test valid and invalid credentials, secure password handling, logout/invalidation, reset-token handling, rate limits, unauthenticated requests, forbidden role escalation, and role-protected endpoints. Verify the frontend authentication flow.
 
 ## T004 — Teacher applications and approval
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T003
 - **Expected result:** Teacher profiles, application/status workflows, admin approval, and eligibility checks with auditable decisions.
 - **Completion check:** Test application submission, allowed status transitions, admin-only review, rejection, and enforcement against unapproved teachers. Verify corresponding student/teacher/admin interfaces.
+- **Evidence:** October 25, 2026: implemented TeacherProfile/AuditLog Prisma models and migration; teacher module (schemas, service, routes) with submit/resubmit, admin review approve/reject, eligibility; auth/role middleware integration; 11 backend tests covering submission, duplicate, transitions, admin-only review, rejection, resubmission, enforcement; typecheck, lint, and full backend suite (33 tests) pass. Frontend interfaces not yet implemented (deferred to later tasks).
 
 ## T005 — Course authoring and media
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T004
 - **Expected result:** Approved teachers can manage their own courses, sections, lessons, and media using private file access and a documented video-provider integration.
 - **Completion check:** Test ownership boundaries, ordering, input validation, upload type/size limits, private file access, and media references. Verify authoring interfaces. Select the video provider before provider-specific implementation and document any external verification limits.
+- **Evidence:** October 27, 2026: implemented Prisma models Course/CourseSection/Lesson/MediaAsset with migration 20261027040527_t005_course_authoring. Added courses module (schemas, service, routes) with approved-teacher gating, ownership checks, section/lesson CRUD + reorder, private media upload/download/delete with type/size allowlists and path-traversal protection. Video provider selection deferred to operator approval (gate T005); lessons store opaque provider/ref fields (default external_url) and no provider-specific integration is implemented. Storage uses STORAGE_ROOT with generated keys. 7 new backend tests (40 total) pass; typecheck, lint, build pass. Frontend authoring interfaces deferred to later tasks.
 
 ## T006 — Course moderation and public catalog
 - **Status:** TODO

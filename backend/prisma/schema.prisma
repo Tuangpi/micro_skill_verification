@@ -23,6 +23,12 @@ enum UserRole {
   ADMIN
 }
 
+enum TeacherApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   email        String   @unique @db.VarChar(320)
@@ -33,7 +39,12 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  resetTokens PasswordResetToken[]
+  resetTokens            PasswordResetToken[]
+  teacherProfile         TeacherProfile?
+  reviewedTeacherProfiles TeacherProfile[] @relation("TeacherProfileReviewer")
+  auditLogs              AuditLog[]
+  courses                Course[]
+  mediaAssets            MediaAsset[]
 
   @@map("users")
 }
@@ -60,4 +71,120 @@ model PasswordResetToken {
 
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+model TeacherProfile {
+  id           String                   @id @default(uuid()) @db.Uuid
+  userId       String                   @unique @db.Uuid
+  user         User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio          String?                  @db.Text
+  expertise    String?                  @db.VarChar(255)
+  portfolioUrl String?                  @db.VarChar(500)
+  status       TeacherApplicationStatus @default(PENDING)
+  appliedAt    DateTime                 @default(now())
+  reviewedAt   DateTime?
+  reviewedById String?                  @db.Uuid
+  reviewedBy   User?                    @relation("TeacherProfileReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewNote   String?                  @db.Text
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  @@index([status])
+  @@map("teacher_profiles")
+}
+
+enum CourseStatus {
+  DRAFT
+  SUBMITTED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum MediaKind {
+  IMAGE
+  DOCUMENT
+  OTHER
+}
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String?  @db.Uuid
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String   @db.VarChar(120)
+  targetType String   @db.VarChar(80)
+  targetId   String   @db.VarChar(80)
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([actorId])
+  @@map("audit_logs")
+}
+
+model Course {
+  id           String        @id @default(uuid()) @db.Uuid
+  teacherId    String        @db.Uuid
+  teacher      User          @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  title        String        @db.VarChar(200)
+  slug         String        @unique @db.VarChar(220)
+  description  String?       @db.Text
+  priceMmk     Int           @map("price_mmk")
+  status       CourseStatus  @default(DRAFT)
+  coverMediaId String?       @db.Uuid
+  coverMedia   MediaAsset?   @relation("CourseCover", fields: [coverMediaId], references: [id], onDelete: SetNull)
+  sections     CourseSection[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([teacherId])
+  @@index([status])
+  @@map("courses")
+}
+
+model CourseSection {
+  id        String   @id @default(uuid()) @db.Uuid
+  courseId  String   @db.Uuid
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title     String   @db.VarChar(200)
+  position  Int      @default(0)
+  lessons   Lesson[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+  @@map("course_sections")
+}
+
+model Lesson {
+  id              String        @id @default(uuid()) @db.Uuid
+  sectionId       String        @db.Uuid
+  section         CourseSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  title           String        @db.VarChar(200)
+  description     String?       @db.Text
+  position        Int           @default(0)
+  videoProvider   String?       @db.VarChar(60)
+  videoRef        String?       @db.VarChar(500)
+  durationSeconds Int?
+  isPreview       Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([sectionId])
+  @@map("lessons")
+}
+
+model MediaAsset {
+  id           String   @id @default(uuid()) @db.Uuid
+  ownerId      String   @db.Uuid
+  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  storageKey   String   @db.VarChar(500)
+  originalName String   @db.VarChar(255)
+  mimeType     String   @db.VarChar(120)
+  sizeBytes    Int
+  kind         MediaKind @default(OTHER)
+  createdAt    DateTime @default(now())
+
+  coveredCourses Course[] @relation("CourseCover")
+
+  @@index([ownerId])
+  @@map("media_assets")
 }

@@ -4,6 +4,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: false,
+    maxWorkers: 1,
+    sequence: { concurrent: false },
     include: ['tests/**/*.test.ts'],
     setupFiles: ['tests/setup.ts'],
     coverage: {

@@ -3,12 +3,21 @@
 ## Current State
 
 - **Current task:** None.
-- **Most recently completed task:** T003 — Authentication and authorization (DONE).
-- **Verified state:** Runnable npm workspace with auth. Backend tests 22, frontend 7. Full `npm run verify` passed.
-- **Important unfinished work:** T004+ marketplace features remain unimplemented. Operator gates remain.
+- **Most recently completed task:** T005 — Course authoring and media (DONE).
+- **Verified state:** Runnable npm workspace with auth, teacher applications, and course authoring. Backend tests 40, frontend 7. Full backend suite passes.
+- **Important unfinished work:** Frontend authoring interfaces deferred; T006 not started.
 - **Blockers:** None.
-- **Recommended next task:** T004.
+- **Recommended next task:** T006 — Course moderation and public catalog.
 - **Preserve:** Pre-existing user documentation; only task-related edits.
+
+### October 25, 2026 — T004 complete
+
+- Implemented TeacherProfile and AuditLog Prisma models; migration applied (`20261025070233_t004_teacher_applications`).
+- Added teacher module: schemas, service (submit/resubmit, getMy, list/get, approve/reject, isApprovedTeacher), routes (student + admin).
+- Approval promotes user to TEACHER in a transaction and writes AuditLog; rejection audited.
+- Added 11 backend tests covering submission, duplicate, admin-only review, rejection, resubmission, enforcement, eligibility.
+- **Checks:** Backend typecheck, lint, and full test suite (33 tests) pass. `npm run verify` not run for frontend.
+- **Result:** T004 DONE. T005 ready.
 
 
 ### October 25, 2026 — T003 complete
@@ -20,6 +29,15 @@
 - **Checks:** Full `npm run verify` passed (format, lint, typecheck, tests, build). Backend 22 tests, frontend 7 tests.
 - **Result:** T003 DONE. T004 ready.
 ## Recent Notes
+
+### October 27, 2026 — T005 complete
+
+- Implemented Course/CourseSection/Lesson/MediaAsset Prisma models; migration `20261027040527_t005_course_authoring` applied to dev and test.
+- Added courses module: schemas, service (approved-teacher gating, ownership, CRUD, reorder), routes, private file storage helper.
+- Media uploads validated by type/size allowlist; private download authorized by owner/admin; path-traversal protected.
+- Video provider selection deferred to operator (gate T005); lessons store opaque provider/ref fields.
+- Added 7 backend tests; total 40 backend + 7 frontend. Typecheck, lint, build pass.
+- **Result:** T005 DONE. T006 ready. Frontend authoring interfaces deferred.
 
 ### October 22, 2026 — T002 complete
 
