@@ -52,6 +52,11 @@ model User {
   paymentSubmissions     PaymentSubmission[]
   reviewedPaymentSubmissions PaymentSubmission[] @relation("PaymentSubmissionReviewer")
   enrollments            Enrollment[]
+  teacherEarnings        TeacherEarning[]
+  createdTeacherEarnings TeacherEarning[] @relation("TeacherEarningCreator")
+  payoutRequests         PayoutRequest[]
+  reviewedPayoutRequests PayoutRequest[] @relation("PayoutRequestReviewer")
+  recordedPayouts        PayoutTransaction[] @relation("PayoutRecorder")
 
   @@map("users")
 }
@@ -143,6 +148,7 @@ model Course {
   enrollments  Enrollment[]
   quizzes      Quiz[]
   certificates Certificate[]
+  teacherEarnings TeacherEarning[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -233,6 +239,7 @@ model Purchase {
 
   paymentSubmissions PaymentSubmission[]
   enrollment         Enrollment?
+  teacherEarning     TeacherEarning?
 
   @@index([studentId])
   @@index([courseId])
@@ -361,4 +368,84 @@ model Certificate {
   @@unique([studentId, courseId])
   @@index([courseId])
   @@map("certificates")
+}
+
+enum TeacherEarningType {
+  SALE
+  REFUND
+  ADJUSTMENT
+  PAYOUT
+}
+
+model TeacherEarning {
+  id                 String             @id @default(uuid()) @db.Uuid
+  teacherId          String             @db.Uuid
+  teacher            User               @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  courseId           String?            @db.Uuid
+  course             Course?            @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  purchaseId         String?            @unique @db.Uuid
+  purchase           Purchase?          @relation(fields: [purchaseId], references: [id], onDelete: SetNull)
+  paymentSubmissionId String?           @db.Uuid
+  payoutRequestId     String?            @unique @db.Uuid
+  payoutRequest       PayoutRequest?     @relation(fields: [payoutRequestId], references: [id], onDelete: SetNull)
+  type               TeacherEarningType
+  grossAmountMmk     Int                @default(0)
+  commissionRateBps  Int                @default(0)
+  commissionAmountMmk Int               @default(0)
+  amountMmk          Int
+  currency           String             @default("MMK") @db.VarChar(8)
+  note               String?            @db.Text
+  metadata           Json?
+  createdById        String?            @db.Uuid
+  createdBy          User?              @relation("TeacherEarningCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt          DateTime           @default(now())
+
+  @@index([teacherId])
+  @@index([courseId])
+  @@index([createdAt])
+  @@map("teacher_earnings")
+}
+
+enum PayoutRequestStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model PayoutRequest {
+  id           String              @id @default(uuid()) @db.Uuid
+  teacherId    String              @db.Uuid
+  teacher      User                @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  amountMmk    Int
+  status       PayoutRequestStatus  @default(REQUESTED)
+  note         String?             @db.Text
+  reviewNote   String?             @db.Text
+  reviewedById String?             @db.Uuid
+  reviewedBy   User?               @relation("PayoutRequestReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt   DateTime?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  transaction  PayoutTransaction?
+  earning      TeacherEarning?
+
+  @@index([teacherId])
+  @@index([status])
+  @@map("payout_requests")
+}
+
+model PayoutTransaction {
+  id              String        @id @default(uuid()) @db.Uuid
+  payoutRequestId String        @unique @db.Uuid
+  payoutRequest   PayoutRequest @relation(fields: [payoutRequestId], references: [id], onDelete: Cascade)
+  recordedById    String        @db.Uuid
+  recordedBy      User          @relation("PayoutRecorder", fields: [recordedById], references: [id], onDelete: Cascade)
+  amountMmk       Int
+  reference       String        @unique @db.VarChar(120)
+  note            String?       @db.Text
+  paidAt          DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+
+  @@index([recordedById])
+  @@map("payout_transactions")
 }

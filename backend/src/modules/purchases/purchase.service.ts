@@ -7,6 +7,7 @@ import {
   ValidationError,
 } from '../../shared/errors/app-error.js';
 import type { FileStorage } from '../../shared/storage/file-storage.js';
+import { PLATFORM_COMMISSION_BPS } from '../earnings/earnings.service.js';
 import {
   createPurchaseSchema,
   createPaymentSubmissionSchema,
@@ -339,7 +340,7 @@ export function createPurchaseService(
 
     const submission = await prisma.paymentSubmission.findUnique({
       where: { id },
-      include: { purchase: true },
+      include: { purchase: { include: { course: true } } },
     });
     if (!submission) throw new NotFoundError('Payment submission not found');
     if (submission.status !== 'PENDING')
@@ -348,8 +349,8 @@ export function createPurchaseService(
       throw new ConflictError('Purchase already approved');
 
     const updated = await prisma.$transaction(async (tx) => {
-      const s = await tx.paymentSubmission.update({
-        where: { id },
+      const claim = await tx.paymentSubmission.updateMany({
+        where: { id, status: 'PENDING' },
         data: {
           status: 'APPROVED',
           reviewedAt: new Date(),
@@ -357,10 +358,14 @@ export function createPurchaseService(
           reviewNote: data.note ?? null,
         },
       });
-      await tx.purchase.update({
-        where: { id: submission.purchaseId },
+      if (claim.count !== 1)
+        throw new ConflictError('Only pending submissions can be approved');
+
+      await tx.purchase.updateMany({
+        where: { id: submission.purchaseId, status: { not: 'APPROVED' } },
         data: { status: 'APPROVED' },
       });
+
       await tx.enrollment.upsert({
         where: { purchaseId: submission.purchaseId },
         create: {
@@ -370,6 +375,27 @@ export function createPurchaseService(
         },
         update: {},
       });
+
+      // Record teacher earnings exactly once per purchase.
+      const course = submission.purchase.course;
+      const gross = submission.purchase.priceMmk;
+      const commission = Math.round((gross * PLATFORM_COMMISSION_BPS) / 10000);
+      await tx.teacherEarning.upsert({
+        where: { purchaseId: submission.purchaseId },
+        create: {
+          teacherId: course.teacherId,
+          courseId: course.id,
+          purchaseId: submission.purchaseId,
+          paymentSubmissionId: id,
+          type: 'SALE',
+          grossAmountMmk: gross,
+          commissionRateBps: PLATFORM_COMMISSION_BPS,
+          commissionAmountMmk: commission,
+          amountMmk: gross - commission,
+        },
+        update: {},
+      });
+
       await tx.auditLog.create({
         data: {
           actorId: adminId,
@@ -380,10 +406,17 @@ export function createPurchaseService(
             purchaseId: submission.purchaseId,
             studentId: submission.purchase.studentId,
             courseId: submission.purchase.courseId,
+            teacherId: course.teacherId,
+            grossAmountMmk: gross,
+            commissionAmountMmk: commission,
+            teacherAmountMmk: gross - commission,
           },
         },
       });
-      return s;
+
+      const refreshed = await tx.paymentSubmission.findUnique({ where: { id } });
+      if (!refreshed) throw new NotFoundError('Payment submission not found');
+      return refreshed;
     });
 
     return toSubmissionView(updated);

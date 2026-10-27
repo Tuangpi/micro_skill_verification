@@ -14,6 +14,10 @@ import { createAuthRateLimiter } from './modules/auth/rate-limit.js';
 import { createTeacherService } from './modules/teachers/teacher.service.js';
 import { createCourseService } from './modules/courses/course.service.js';
 import { createPurchaseService } from './modules/purchases/purchase.service.js';
+import { createEarningsService } from './modules/earnings/earnings.service.js';
+import { createEarningsRouter } from './modules/earnings/earnings.routes.js';
+import { createPayoutService } from './modules/payouts/payout.service.js';
+import { createPayoutRouter } from './modules/payouts/payout.routes.js';
 import { createLearningService } from './modules/learning/learning.service.js';
 import { createQuizService } from './modules/quizzes/quiz.service.js';
 import { createCourseRouter } from './modules/courses/course.routes.js';
@@ -153,6 +157,8 @@ export function createApp({
   });
   app.use(`${config.apiPrefix}/teacher`, courseRouter);
 
+  const earningsService = createEarningsService(prisma, logger);
+  const payoutService = createPayoutService(prisma, logger);
   const purchaseService = createPurchaseService(prisma, logger, fileStorage);
   const purchaseRouter = createPurchaseRouter({
     purchaseService,
@@ -167,6 +173,20 @@ export function createApp({
     isProduction: config.isProduction,
   });
   app.use(`${config.apiPrefix}/admin`, purchaseAdminRouter);
+
+  const earningsRouter = createEarningsRouter({
+    earningsService,
+    allowedOrigins: config.allowedOrigins,
+    isProduction: config.isProduction,
+  });
+  app.use(config.apiPrefix, earningsRouter);
+
+  const payoutRouter = createPayoutRouter({
+    payoutService,
+    allowedOrigins: config.allowedOrigins,
+    isProduction: config.isProduction,
+  });
+  app.use(config.apiPrefix, payoutRouter);
 
   const learningService = createLearningService(prisma, logger);
   const learningRouter = createLearningRouter({

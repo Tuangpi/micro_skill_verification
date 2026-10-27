@@ -41,12 +41,21 @@
 - `PATCH /teacher/courses/{id}`
 - `POST /teacher/courses/{id}/submit`
 - `GET /teacher/earnings`
+- `GET /admin/earnings`
+- `POST /admin/earnings/adjustments`
 - `GET /admin/payment-submissions`
 - `POST /admin/payment-submissions/{id}/approve`
 - `POST /admin/payment-submissions/{id}/reject`
 - `POST /admin/courses/{id}/publish`
 - `POST /admin/payout-requests/{id}/record-payment`
 - `GET /certificates/{number}/verify`
+- `POST /teacher/payout-requests`
+- `GET /teacher/payout-requests`
+- `GET /admin/payout-requests`
+- `POST /admin/payout-requests/{id}/approve`
+- `POST /admin/payout-requests/{id}/reject`
+- `POST /admin/payout-requests/{id}/record-payment`
+- `GET /admin/payouts/report`
 
 ## Rules
 - Use foreign keys, indexes, and unique constraints.

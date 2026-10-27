@@ -3,11 +3,11 @@
 ## Current State
 
 - **Current task:** None.
-- **Most recently completed task:** T009 — Quizzes and certificates (DONE).
+- **Most recently completed task:** T011 — Payouts and financial reporting (DONE).
 - **Verified state:** Runnable npm workspace with auth, teacher applications, course authoring, moderation, public catalog, purchases, payment review, enrollment, protected learning/progress, quizzes, and certificates. Backend tests 40, frontend 7. Full backend suite passes.
-- **Important unfinished work:** Frontend quiz/certificate interfaces deferred; T010 not started.
+- **Important unfinished work:** Frontend quiz/certificate/earnings/payout interfaces deferred; T012 not started.
 - **Blockers:** None.
-- **Recommended next task:** T010 — Teacher earnings ledger.
+- **Recommended next task:** T012 — Bilingual/mobile acceptance.
 - **Preserve:** Pre-existing user documentation; only task-related edits.
 
 ### October 25, 2026 — T004 complete
@@ -29,6 +29,17 @@
 - **Checks:** Full `npm run verify` passed (format, lint, typecheck, tests, build). Backend 22 tests, frontend 7 tests.
 - **Result:** T003 DONE. T004 ready.
 ## Recent Notes
+
+### October 27, 2026 — T010 complete
+
+- Added TeacherEarning model and migration `20261027074048_t010_teacher_earnings`.
+- Documented commission/refund policy in `docs/TEACHER_EARNINGS_RULES.md`.
+- Implemented earnings service: teacher earnings summary/balance, admin list, admin adjustments.
+- Integrated SALE earnings creation into payment approval transaction (idempotent via unique purchaseId).
+- Added routes `GET /teacher/earnings`, `GET /admin/earnings`, `POST /admin/earnings/adjustments`.
+- `npm run verify` passed (40 backend + 7 frontend tests, build).
+- **Result:** T010 DONE. T011 ready.
+
 
 ### October 27, 2026 — T009 complete
 

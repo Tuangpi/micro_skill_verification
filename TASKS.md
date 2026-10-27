@@ -65,13 +65,13 @@ Application implementation has not started as of October 22, 2026. Documentation
 - **Evidence:** October 27, 2026: added Quiz/QuizQuestion/QuizAttempt/Certificate models and migration 20261027070600; documented rules in docs/QUIZ_AND_CERTIFICATE_RULES.md; implemented teacher quiz/question management, student quiz view without answers, server-side scoring, retry limits, certificate issuance on pass + all lessons completed, duplicate prevention, and public verification. `npm run verify` passed (40 backend + 7 frontend tests, build); manual quiz/certificate flow verified. Frontend interfaces deferred.
 
 ## T010 — Teacher earnings ledger
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T007
 - **Expected result:** Documented commission/refund policies, auditable earnings and adjustment records, and teacher earnings visibility, integrated transactionally with approved payments.
 - **Completion check:** Resolve financial policy choices before calculations. Test integer-MMK calculations, approval rollback, concurrent/repeated approval without duplicate earnings, adjustment history, balance accuracy, and teacher isolation. Verify the earnings dashboard. T007 alone does not complete the financial approval workflow.
 
 ## T011 — Payouts and financial reporting
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T010
 - **Expected result:** Teacher payout requests, admin-recorded payouts and references, reporting, and auditable balance changes; no instructor self-service disbursement.
 - **Completion check:** Test available-balance enforcement, concurrent/duplicate payout handling, role/ownership boundaries, allowed transitions, transaction rollback, and audit trails. Verify teacher/admin interfaces and report totals against ledger records.
