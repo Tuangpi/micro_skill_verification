@@ -51,10 +51,11 @@ Application implementation has not started as of October 22, 2026. Documentation
 - **Evidence:** October 27, 2026: added Purchase/PaymentSubmission/Enrollment Prisma models and migration 20261027050750; implemented purchase creation with price snapshot and payment instructions, private receipt submissions, duplicate-reference protection, admin approval/rejection, and enrollment grant on approval. `npm run verify` passed (40 backend + 7 frontend tests, build). Frontend purchase/admin-review interfaces deferred.
 
 ## T008 — Protected learning and progress
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T007
 - **Expected result:** Enrolled students can use protected video lessons, navigate course content, and track progress.
 - **Completion check:** Test unenrolled and cross-account denial, valid access, protected playback authorization/expiry, and repeat progress updates. Verify the player and student dashboard, including mobile layouts.
+- **Evidence:** October 27, 2026: added LessonProgress model/migration 20261027055613; implemented authenticated lesson access with enrollment/ownership/admin authorization, course outline navigation, progress upsert, and playback access expiry. `npm run verify` passed (40 backend + 7 frontend tests, build); manual protected-learning flow verified. Frontend player/dashboard interfaces deferred.
 
 ## T009 — Quizzes and certificates
 - **Status:** TODO

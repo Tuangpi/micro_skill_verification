@@ -46,6 +46,7 @@ model User {
   courses                Course[]
   mediaAssets            MediaAsset[]
   purchases              Purchase[]
+  lessonProgress         LessonProgress[]
   paymentSubmissions     PaymentSubmission[]
   reviewedPaymentSubmissions PaymentSubmission[] @relation("PaymentSubmissionReviewer")
   enrollments            Enrollment[]
@@ -172,6 +173,7 @@ model Lesson {
   durationSeconds Int?
   isPreview       Boolean       @default(false)
   createdAt       DateTime      @default(now())
+  progress        LessonProgress[]
   updatedAt       DateTime      @updatedAt
 
   @@index([sectionId])
@@ -270,4 +272,21 @@ model Enrollment {
   @@unique([studentId, courseId])
   @@index([courseId])
   @@map("enrollments")
+}
+
+model LessonProgress {
+  id              String   @id @default(uuid()) @db.Uuid
+  studentId       String   @db.Uuid
+  student         User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  lessonId        String   @db.Uuid
+  lesson          Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  positionSeconds Int      @default(0)
+  completed       Boolean  @default(false)
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([studentId, lessonId])
+  @@index([lessonId])
+  @@map("lesson_progress")
 }

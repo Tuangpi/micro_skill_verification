@@ -3,11 +3,11 @@
 ## Current State
 
 - **Current task:** None.
-- **Most recently completed task:** T007 — Purchases, payment review, and enrollment (DONE).
-- **Verified state:** Runnable npm workspace with auth, teacher applications, course authoring, moderation, public catalog, purchases, payment review, and enrollment. Backend tests 40, frontend 7. Full backend suite passes.
-- **Important unfinished work:** Frontend purchase/admin-review interfaces deferred; T008 not started.
+- **Most recently completed task:** T008 — Protected learning and progress (DONE).
+- **Verified state:** Runnable npm workspace with auth, teacher applications, course authoring, moderation, public catalog, purchases, payment review, enrollment, and protected learning/progress. Backend tests 40, frontend 7. Full backend suite passes.
+- **Important unfinished work:** Frontend learning/player/dashboard interfaces deferred; T009 not started.
 - **Blockers:** None.
-- **Recommended next task:** T008 — Protected learning and progress.
+- **Recommended next task:** T009 — Quizzes and certificates.
 - **Preserve:** Pre-existing user documentation; only task-related edits.
 
 ### October 25, 2026 — T004 complete
@@ -29,6 +29,14 @@
 - **Checks:** Full `npm run verify` passed (format, lint, typecheck, tests, build). Backend 22 tests, frontend 7 tests.
 - **Result:** T003 DONE. T004 ready.
 ## Recent Notes
+
+### October 27, 2026 — T008 complete
+
+- Added LessonProgress model and migration `20261027055613_t008_protected_learning_progress`.
+- Implemented protected lesson access with enrollment/ownership/admin authorization, course outline navigation, progress upsert, and playback access expiry.
+- Typecheck, lint, and full verify pass (40 backend + 7 frontend tests, build). Manual protected-learning flow verified.
+- **Result:** T008 DONE. T009 ready. Frontend learning/player/dashboard interfaces deferred.
+
 
 ### October 27, 2026 — T007 complete
 

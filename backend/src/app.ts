@@ -14,11 +14,13 @@ import { createAuthRateLimiter } from './modules/auth/rate-limit.js';
 import { createTeacherService } from './modules/teachers/teacher.service.js';
 import { createCourseService } from './modules/courses/course.service.js';
 import { createPurchaseService } from './modules/purchases/purchase.service.js';
+import { createLearningService } from './modules/learning/learning.service.js';
 import { createCourseRouter } from './modules/courses/course.routes.js';
 import {
   createPurchaseRouter,
   createPurchaseAdminRouter,
 } from './modules/purchases/purchase.routes.js';
+import { createLearningRouter } from './modules/learning/learning.routes.js';
 import { createPublicCourseRouter } from './modules/courses/course-public.routes.js';
 import { createCourseAdminRouter } from './modules/courses/course-admin.routes.js';
 import { createFileStorage } from './shared/storage/file-storage.js';
@@ -163,6 +165,14 @@ export function createApp({
     isProduction: config.isProduction,
   });
   app.use(`${config.apiPrefix}/admin`, purchaseAdminRouter);
+
+  const learningService = createLearningService(prisma, logger);
+  const learningRouter = createLearningRouter({
+    learningService,
+    allowedOrigins: config.allowedOrigins,
+    isProduction: config.isProduction,
+  });
+  app.use(config.apiPrefix, learningRouter);
 
   const publicCourseRouter = createPublicCourseRouter({
     courseService,
