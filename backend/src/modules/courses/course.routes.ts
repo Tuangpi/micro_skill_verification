@@ -129,6 +129,38 @@ export function createCourseRouter(deps: CourseRouterDeps): Router {
     }
   });
 
+  router.post(
+    '/courses/:id/submit',
+    csrfProtection,
+    requireAuth,
+    async (req, res, next) => {
+      try {
+        const user = getUser(req);
+        if (!user) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          });
+          return;
+        }
+        const approved = await deps.courseService.isApprovedTeacher(user.id);
+        if (user.role === 'TEACHER' && !approved) {
+          res.status(403).json({
+            error: { code: 'FORBIDDEN', message: 'Approved teacher account required' },
+          });
+          return;
+        }
+        const view = await deps.courseService.submitCourse(
+          user.id,
+          user.role,
+          String(req.params.id),
+        );
+        sendData(res, { course: view });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   // Sections
   router.post(
     '/courses/:courseId/sections',

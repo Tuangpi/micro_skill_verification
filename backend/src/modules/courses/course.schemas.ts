@@ -59,6 +59,10 @@ export const reorderSchema = z.object({
   orderedIds: z.array(z.string().uuid()).min(1).max(200),
 });
 
+export const courseReviewSchema = z.object({
+  note: z.string().trim().max(1000).optional().nullable(),
+});
+
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
 export type CreateSectionInput = z.infer<typeof createSectionSchema>;

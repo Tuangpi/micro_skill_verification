@@ -14,6 +14,8 @@ import { createAuthRateLimiter } from './modules/auth/rate-limit.js';
 import { createTeacherService } from './modules/teachers/teacher.service.js';
 import { createCourseService } from './modules/courses/course.service.js';
 import { createCourseRouter } from './modules/courses/course.routes.js';
+import { createPublicCourseRouter } from './modules/courses/course-public.routes.js';
+import { createCourseAdminRouter } from './modules/courses/course-admin.routes.js';
 import { createFileStorage } from './shared/storage/file-storage.js';
 import {
   createTeacherRouter,
@@ -141,6 +143,18 @@ export function createApp({
     isProduction: config.isProduction,
   });
   app.use(`${config.apiPrefix}/teacher`, courseRouter);
+
+  const publicCourseRouter = createPublicCourseRouter({
+    courseService,
+  });
+  app.use(config.apiPrefix, publicCourseRouter);
+
+  const courseAdminRouter = createCourseAdminRouter({
+    courseService,
+    allowedOrigins: config.allowedOrigins,
+    isProduction: config.isProduction,
+  });
+  app.use(`${config.apiPrefix}/admin`, courseAdminRouter);
 
   const teacherAdminRouter = createTeacherAdminRouter({
     teacherService,

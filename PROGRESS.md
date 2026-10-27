@@ -3,11 +3,11 @@
 ## Current State
 
 - **Current task:** None.
-- **Most recently completed task:** T005 — Course authoring and media (DONE).
-- **Verified state:** Runnable npm workspace with auth, teacher applications, and course authoring. Backend tests 40, frontend 7. Full backend suite passes.
-- **Important unfinished work:** Frontend authoring interfaces deferred; T006 not started.
+- **Most recently completed task:** T006 — Course moderation and public catalog (DONE).
+- **Verified state:** Runnable npm workspace with auth, teacher applications, course authoring, moderation, and public catalog. Backend tests 40, frontend 7. Full backend suite passes.
+- **Important unfinished work:** Frontend authoring/moderation/catalog interfaces deferred; T007 not started.
 - **Blockers:** None.
-- **Recommended next task:** T006 — Course moderation and public catalog.
+- **Recommended next task:** T007 — Purchases, payment review, and enrollment.
 - **Preserve:** Pre-existing user documentation; only task-related edits.
 
 ### October 25, 2026 — T004 complete
@@ -29,6 +29,15 @@
 - **Checks:** Full `npm run verify` passed (format, lint, typecheck, tests, build). Backend 22 tests, frontend 7 tests.
 - **Result:** T003 DONE. T004 ready.
 ## Recent Notes
+
+### October 27, 2026 — T006 complete
+
+- Added teacher course submission endpoint (`POST /teacher/courses/:id/submit`) with approved-teacher gating and DRAFT->SUBMITTED transition.
+- Added admin moderation endpoints (`POST /admin/courses/:id/publish|reject|archive`) with allowed transitions and AuditLog entries.
+- Added public catalog endpoints (`GET /courses`, `GET /courses/:slug`) exposing only PUBLISHED course metadata.
+- Typecheck, lint, and full test suite (40 backend + 7 frontend) pass; manual moderation/catalog flow verified.
+- **Result:** T006 DONE. T007 ready. Frontend moderation/catalog interfaces deferred.
+
 
 ### October 27, 2026 — T005 complete
 

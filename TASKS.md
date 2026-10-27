@@ -37,10 +37,11 @@ Application implementation has not started as of October 22, 2026. Documentation
 - **Evidence:** October 27, 2026: implemented Prisma models Course/CourseSection/Lesson/MediaAsset with migration 20261027040527_t005_course_authoring. Added courses module (schemas, service, routes) with approved-teacher gating, ownership checks, section/lesson CRUD + reorder, private media upload/download/delete with type/size allowlists and path-traversal protection. Video provider selection deferred to operator approval (gate T005); lessons store opaque provider/ref fields (default external_url) and no provider-specific integration is implemented. Storage uses STORAGE_ROOT with generated keys. 7 new backend tests (40 total) pass; typecheck, lint, build pass. Frontend authoring interfaces deferred to later tasks.
 
 ## T006 — Course moderation and public catalog
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T005
 - **Expected result:** Teacher course submission, admin review/publication, auditable decisions, and public course listing/detail pages.
 - **Completion check:** Test approved-teacher eligibility, allowed moderation transitions, admin-only publication, unpublished content exclusion, and protection of paid lesson content in public responses. Verify moderation and catalog interfaces.
+- **Evidence:** October 27, 2026: added teacher submit endpoint (DRAFT->SUBMITTED), admin publish/reject/archive endpoints with auditable AuditLog entries, and public catalog list/detail endpoints exposing only PUBLISHED course metadata. Backend service/route/typecheck/lint/full suite (40 backend + 7 frontend) pass; manual flow test passed (submit, admin-only publish, invalid transitions, unpublished exclusion). Frontend moderation/catalog interfaces deferred to later tasks.
 
 ## T007 — Purchases, payment review, and enrollment
 - **Status:** TODO

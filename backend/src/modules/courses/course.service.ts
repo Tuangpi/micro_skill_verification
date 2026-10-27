@@ -14,6 +14,7 @@ import {
   createLessonSchema,
   updateLessonSchema,
   reorderSchema,
+  courseReviewSchema,
 } from './course.schemas.js';
 import type { FileStorage } from '../../shared/storage/file-storage.js';
 
@@ -125,6 +126,12 @@ export type CourseService = {
     id: string,
   ) => Promise<{ asset: MediaAssetView; storageKey: string }>;
   deleteMediaAsset: (userId: string, role: string, id: string) => Promise<void>;
+  submitCourse: (userId: string, role: string, id: string) => Promise<CourseView>;
+  publishCourse: (adminId: string, id: string) => Promise<CourseView>;
+  rejectCourse: (adminId: string, id: string, input: unknown) => Promise<CourseView>;
+  archiveCourse: (adminId: string, id: string) => Promise<CourseView>;
+  listPublishedCourses: () => Promise<CourseView[]>;
+  getPublishedCourseBySlug: (slug: string) => Promise<CourseView>;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -320,6 +327,133 @@ export function createCourseService(
       throw new ConflictError('Only draft courses can be deleted');
     }
     await prisma.course.delete({ where: { id } });
+  }
+
+  async function submitCourse(
+    userId: string,
+    role: string,
+    id: string,
+  ): Promise<CourseView> {
+    const course = await loadCourse(id);
+    assertOwnerOrAdmin(course, userId, role);
+    if (role !== 'ADMIN' && !(await isApprovedTeacher(userId))) {
+      throw new ForbiddenError('Approved teacher account required');
+    }
+    if (course.status !== 'DRAFT') {
+      throw new ConflictError('Only draft courses can be submitted');
+    }
+    const updated = await prisma.$transaction(async (tx) => {
+      const c = await tx.course.update({
+        where: { id },
+        data: { status: 'SUBMITTED' },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorId: userId,
+          action: 'COURSE_SUBMITTED',
+          targetType: 'Course',
+          targetId: id,
+          metadata: { teacherId: course.teacherId },
+        },
+      });
+      return c;
+    });
+    return toCourseView(updated);
+  }
+
+  async function publishCourse(adminId: string, id: string): Promise<CourseView> {
+    const course = await loadCourse(id);
+    if (course.status !== 'SUBMITTED') {
+      throw new ConflictError('Only submitted courses can be published');
+    }
+    const updated = await prisma.$transaction(async (tx) => {
+      const c = await tx.course.update({
+        where: { id },
+        data: { status: 'PUBLISHED' },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorId: adminId,
+          action: 'COURSE_PUBLISHED',
+          targetType: 'Course',
+          targetId: id,
+          metadata: { teacherId: course.teacherId },
+        },
+      });
+      return c;
+    });
+    return toCourseView(updated);
+  }
+
+  async function rejectCourse(
+    adminId: string,
+    id: string,
+    input: unknown,
+  ): Promise<CourseView> {
+    const course = await loadCourse(id);
+    if (course.status !== 'SUBMITTED') {
+      throw new ConflictError('Only submitted courses can be rejected');
+    }
+    const parsed = courseReviewSchema.safeParse(input ?? {});
+    if (!parsed.success)
+      throw new ValidationError('Request validation failed', parsed.error.issues);
+    const data = parsed.data;
+    const updated = await prisma.$transaction(async (tx) => {
+      const c = await tx.course.update({
+        where: { id },
+        data: { status: 'DRAFT' },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorId: adminId,
+          action: 'COURSE_REJECTED',
+          targetType: 'Course',
+          targetId: id,
+          metadata: { teacherId: course.teacherId, note: data.note ?? null },
+        },
+      });
+      return c;
+    });
+    return toCourseView(updated);
+  }
+
+  async function archiveCourse(adminId: string, id: string): Promise<CourseView> {
+    const course = await loadCourse(id);
+    if (course.status !== 'PUBLISHED') {
+      throw new ConflictError('Only published courses can be archived');
+    }
+    const updated = await prisma.$transaction(async (tx) => {
+      const c = await tx.course.update({
+        where: { id },
+        data: { status: 'ARCHIVED' },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorId: adminId,
+          action: 'COURSE_ARCHIVED',
+          targetType: 'Course',
+          targetId: id,
+          metadata: { teacherId: course.teacherId },
+        },
+      });
+      return c;
+    });
+    return toCourseView(updated);
+  }
+
+  async function listPublishedCourses(): Promise<CourseView[]> {
+    const courses = await prisma.course.findMany({
+      where: { status: 'PUBLISHED' },
+      orderBy: { createdAt: 'desc' },
+    });
+    return courses.map(toCourseView);
+  }
+
+  async function getPublishedCourseBySlug(slug: string): Promise<CourseView> {
+    const course = await prisma.course.findUnique({ where: { slug } });
+    if (!course || course.status !== 'PUBLISHED')
+      throw new NotFoundError('Course not found');
+    return toCourseView(course);
   }
 
   async function ensureSectionOwnership(userId: string, role: string, sectionId: string) {
@@ -610,5 +744,11 @@ export function createCourseService(
     createMediaAsset,
     getMediaAsset,
     deleteMediaAsset,
+    submitCourse,
+    publishCourse,
+    rejectCourse,
+    archiveCourse,
+    listPublishedCourses,
+    getPublishedCourseBySlug,
   };
 }
