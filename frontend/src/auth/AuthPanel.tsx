@@ -8,9 +8,11 @@ import {
   type RegisterInput,
 } from '../api/client.ts';
 import type { AuthUser } from '../api/types.ts';
+import { useLanguage } from '../i18n.tsx';
 
 /** Minimal authentication flow for manual verification. */
 export function AuthPanel() {
+  const { t } = useLanguage();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -71,7 +73,7 @@ export function AuthPanel() {
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-medium">Authentication</h2>
+      <h2 className="mb-4 text-lg font-medium">{t('auth')}</h2>
       <div className="mb-4 flex gap-2">
         <button
           type="button"
@@ -91,7 +93,7 @@ export function AuthPanel() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           type="email"
-          placeholder="Email"
+          placeholder={t('email')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="rounded border border-slate-300 px-3 py-2"
@@ -100,7 +102,7 @@ export function AuthPanel() {
         {mode === 'register' && (
           <input
             type="text"
-            placeholder="Name"
+            placeholder={t('name')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="rounded border border-slate-300 px-3 py-2"
@@ -109,7 +111,7 @@ export function AuthPanel() {
         )}
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t('password')}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="rounded border border-slate-300 px-3 py-2"
@@ -120,7 +122,7 @@ export function AuthPanel() {
           disabled={busy}
           className="rounded bg-emerald-600 px-3 py-2 text-white disabled:opacity-50"
         >
-          {mode === 'register' ? 'Create account' : 'Sign in'}
+          {mode === 'register' ? t('createAccount') : t('signIn')}
         </button>
       </form>
       <div className="mt-4 flex flex-wrap gap-2">

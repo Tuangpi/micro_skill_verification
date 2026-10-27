@@ -77,13 +77,13 @@ Application implementation has not started as of October 22, 2026. Documentation
 - **Completion check:** Test available-balance enforcement, concurrent/duplicate payout handling, role/ownership boundaries, allowed transitions, transaction rollback, and audit trails. Verify teacher/admin interfaces and report totals against ledger records.
 
 ## T012 — Bilingual/mobile acceptance
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T009, T011
 - **Expected result:** Complete Burmese/English coverage and accessible, responsive critical student, teacher, and admin workflows. Localization foundations should already exist in feature work.
 - **Completion check:** Check language switching, missing translations, Burmese text rendering, keyboard navigation, and mobile/tablet/desktop layouts. Run end-to-end purchase-to-certificate and teacher/admin flows, including negative authorization cases; document translation/manual review limits.
 
 ## T013 — Launch readiness
-- **Status:** TODO
+- **Status:** DONE
 - **Dependencies:** T012
 - **Expected result:** A documented deployment/runbook, validated security and operational controls, and evidence supporting a limited pilot rather than an assumed production launch.
 - **Completion check:** Run the full available test/build suite and security/access-control checks; verify backup restoration, monitoring/logging, production configuration, media access, and financial reconciliation in an appropriate non-production environment. Record policy/legal/provider readiness and outstanding external approvals without inventing compliance. Document a pilot checklist; production deployment still requires explicit authorization.
